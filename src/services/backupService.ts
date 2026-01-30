@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system/legacy";
+import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { getDb, serialized } from "./database";
 
@@ -11,21 +11,22 @@ export function exportBackup(): Promise<void> {
     const invoices = await db.getAllAsync("SELECT * FROM invoices");
 
     const data = JSON.stringify({ clients, projects, timeEntries, invoices }, null, 2);
-    const path = `${FileSystem.cacheDirectory}lancr-backup.json`;
-    await FileSystem.writeAsStringAsync(path, data);
+    const file = new File(Paths.cache, "lancr-backup.json");
+    file.write(data);
 
     const available = await Sharing.isAvailableAsync();
     if (!available) {
       throw new Error("Sharing is not available on this device.");
     }
 
-    await Sharing.shareAsync(path, { mimeType: "application/json" });
+    await Sharing.shareAsync(file.uri, { mimeType: "application/json" });
   });
 }
 
 export function importBackup(uri: string): Promise<void> {
   return serialized(async () => {
-    const content = await FileSystem.readAsStringAsync(uri);
+    const file = new File(uri);
+    const content = file.text();
     const data = JSON.parse(content);
     if (!data || typeof data !== "object") {
       throw new Error("Invalid backup file.");
