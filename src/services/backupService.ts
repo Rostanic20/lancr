@@ -25,8 +25,10 @@ export function exportBackup(): Promise<void> {
 
 export function importBackup(uri: string): Promise<void> {
   return serialized(async () => {
-    const file = new File(uri);
-    const content = file.text();
+    const source = new File(uri);
+    const copy = new File(Paths.cache, "lancr-import.json");
+    source.copy(copy);
+    const content = copy.text();
     const data = JSON.parse(content);
     if (!data || typeof data !== "object") {
       throw new Error("Invalid backup file.");

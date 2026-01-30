@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ComponentProps } from "react";
 
 interface Props {
-  icon: string;
+  icon: ComponentProps<typeof Ionicons>["name"];
   title: string;
   subtitle: string;
 }
@@ -13,7 +14,7 @@ export function EmptyState({ icon, title, subtitle }: Props) {
 
   return (
     <View style={styles.container}>
-      <Ionicons name={icon as any} size={48} color={color} style={{ opacity: 0.3 }} />
+      <Ionicons name={icon} size={48} color={color} style={{ opacity: 0.3 }} />
       <Text style={[styles.title, { color }]}>{title}</Text>
       <Text style={[styles.subtitle, { color }]}>{subtitle}</Text>
     </View>

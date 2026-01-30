@@ -2,6 +2,11 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Invoice, Client, Project } from "../types";
 
+function esc(text: string | null): string {
+  if (!text) return "";
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export async function exportInvoicePdf(invoice: Invoice, client: Client, project: Project) {
   const html = `
     <html>
@@ -29,14 +34,14 @@ export async function exportInvoicePdf(invoice: Invoice, client: Client, project
 
         <div class="section">
           <div class="section-title">Client</div>
-          <div><strong>${client.name}</strong></div>
-          ${client.company ? `<div>${client.company}</div>` : ""}
-          ${client.email ? `<div>${client.email}</div>` : ""}
+          <div><strong>${esc(client.name)}</strong></div>
+          ${client.company ? `<div>${esc(client.company)}</div>` : ""}
+          ${client.email ? `<div>${esc(client.email)}</div>` : ""}
         </div>
 
         <div class="section">
           <div class="section-title">Project</div>
-          <div><strong>${project.name}</strong></div>
+          <div><strong>${esc(project.name)}</strong></div>
         </div>
 
         <div class="section">
@@ -48,7 +53,7 @@ export async function exportInvoicePdf(invoice: Invoice, client: Client, project
               <th style="text-align:right">Amount</th>
             </tr>
             <tr>
-              <td>${project.name}</td>
+              <td>${esc(project.name)}</td>
               <td style="text-align:right">${(invoice.hours ?? 0).toFixed(2)}</td>
               <td style="text-align:right">${(invoice.hourlyRate ?? 0).toFixed(2)} EUR</td>
               <td style="text-align:right">${invoice.amount.toFixed(2)} EUR</td>

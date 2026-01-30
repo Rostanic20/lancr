@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase;
-let queue: Promise<any> = Promise.resolve();
+let queue: Promise<unknown> = Promise.resolve();
 
 export async function getDb() {
   if (!db) {
