@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, Re
 import { AppState } from "react-native";
 import { getActiveTimer, startTimer, stopTimer } from "../services/timeService";
 import { getProject } from "../services/projectService";
+import { showTimerNotification, dismissTimerNotification } from "../services/notificationService";
 import { TimeEntry } from "../types";
 
 interface TimerContextType {
@@ -48,14 +49,17 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       clearTick();
       if (timer) {
         const proj = await getProject(timer.projectId);
-        setProjectName(proj?.name || null);
+        const name = proj?.name || null;
+        setProjectName(name);
         setElapsed(Math.floor((Date.now() - timer.startedAt) / 1000));
         intervalRef.current = setInterval(() => {
           setElapsed(Math.floor((Date.now() - timer.startedAt) / 1000));
         }, 1000);
+        if (name) showTimerNotification(name).catch(() => {});
       } else {
         setProjectName(null);
         setElapsed(0);
+        dismissTimerNotification().catch(() => {});
       }
     } catch {}
   }, []);
@@ -88,6 +92,7 @@ export function TimerProvider({ children }: { children: ReactNode }) {
       setActiveTimer(null);
       setProjectName(null);
       setElapsed(0);
+      dismissTimerNotification().catch(() => {});
     }
   }, []);
 
